@@ -75,40 +75,43 @@ ChildProcess::~ChildProcess()
     log("ChildProcess", "Deleting Child Process");
 }
 
+void ChildProcess::routineStart()
+{
+    while (this->running) 
+    {
+        this->restarts++;
+        this->pid = fork();
+
+        if (this->pid == 0)
+        {
+            if (!this->outputFile.empty())
+            {
+                int fd = open(this->outputFile.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+                dup2(fd, 1);
+                dup2(fd, 2);
+
+                close(fd);
+            }
+
+            execl(("/usr/bin/" + maincommand).c_str(), maincommand.c_str(), this->args.c_str(), NULL);
+        }
+
+        waitpid(this->pid, NULL, 0);
+    }
+}
+
 void ChildProcess::threadStart()
 {
     log("ChildProcess", "From thread, making system call though exec");
 
-    thread ct([=] {
-        while (this->running) 
-        {
-            this->restarts++;
-            this->pid = fork();
-
-            if (this->pid == 0)
-            {
-                if (!this->outputFile.empty())
-                {
-                    int fd = open(this->outputFile.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-                    dup2(fd, 1);
-                    dup2(fd, 2);
-
-                    close(fd);
-                }
-
-                execl(("/usr/bin/" + maincommand).c_str(), maincommand.c_str(), this->args.c_str(), NULL);
-            }
-
-            waitpid(this->pid, NULL, 0);
-        }
-    });
+    thread routine(&ChildProcess::routineStart, this);
 
     this->thread_lock.wait(this->ulock);
     if (this->shouldkill) {
         ::kill(this->pid, SIGKILL);
     }
 
-    ct.join();
+    routine.join();
 }
 
 void ChildProcess::start()
@@ -116,7 +119,7 @@ void ChildProcess::start()
     log("ChildProcess", "Child process spawning a new thread");
     this->running = true;
     this->starttime = time(nullptr);
-    this->t = thread([=] { threadStart(); });
+    this->t = thread(&ChildProcess::threadStart, this);
 }
 
 void ChildProcess::stop()

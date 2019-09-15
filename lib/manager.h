@@ -46,6 +46,7 @@ class ChildProcess
     thread t;
 
     void threadStart();
+    void routineStart();
 
     public:
         ChildProcess(string, string);

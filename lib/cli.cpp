@@ -47,7 +47,7 @@ void killFromShell(int)
 
 void ShellClient::start()
 {
-    this->t = thread([=] { this->threadStart(); });
+    this->t = thread(&ShellClient::threadStart, this);
 
     signal(SIGINT, killFromShell);
 }
