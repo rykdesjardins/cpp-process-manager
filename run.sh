@@ -1,1 +1,2 @@
-./compile.sh && ./build/cppm -n 4 -o ./output.log node test.js
+rm cli.sock
+./compile.sh && ./build/cppm -n 4 -o ./output.log -s ./cli.sock node test.js

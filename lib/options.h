@@ -12,7 +12,8 @@ struct Options
     bool valid = false;
     string processName;
     string processArgs = "";
-    string outputFile;
+    string outputFile = "output.log";
+    string shellSockFile = "./cli.sock";
     int processCount = 1;
 };
 

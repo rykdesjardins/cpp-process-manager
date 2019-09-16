@@ -10,6 +10,10 @@ void affectOptions(Options * opt, char * name, char * value)
     {
         opt->processCount = strtol(value, NULL, 0);   
     }
+    else if (strncmp(name, "-s", 2) == 0)
+    {
+        opt->shellSockFile = value;
+    }
 };
 
 void parseOptions(Options * opt, int count, char** args)

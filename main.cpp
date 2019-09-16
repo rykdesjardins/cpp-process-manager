@@ -1,6 +1,15 @@
-#include "lib/cli.h"
+#include <signal.h>
+#include "lib/shellserver.h"
 #include "lib/manager.h"
 #include "lib/options.h"
+
+ProcessManager * manager;
+ShellServer * shellserver;
+ 
+void handleSigInt(int)
+{
+    shellserver->stop();
+}
 
 int main(int argc, char *argv[]) 
 {
@@ -12,16 +21,18 @@ int main(int argc, char *argv[])
 
     Options opt;
     parseOptions(&opt, argc, argv);
-    ProcessManager * manager = new ProcessManager(&opt);
-    ShellClient * cli = new ShellClient(manager);
+    manager = new ProcessManager(&opt);
+    shellserver = new ShellServer(manager);
 
     for (int i = 0; i < opt.processCount; i++) manager->spawn(opt.processArgs);
-    cli->start();
-    cli->block();
+
+    signal(SIGINT, handleSigInt);
+    shellserver->start();
+    shellserver->block();
 
     manager->rest();
 
-    delete cli;
+    delete shellserver;
     delete manager;
 
     log("Main", "Exiting process normally");

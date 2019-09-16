@@ -76,6 +76,7 @@ class ProcessManager
         void kill();
         bool isRunning() { return running; };
         mutex& getMutex() { return this->mtx; };
+        const Options* getOptions() { return this->opt; }
 };
 
 #endif
