@@ -86,7 +86,7 @@ void ChildProcess::routineStart()
         {
             if (!this->outputFile.empty())
             {
-                int fd = open(this->outputFile.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+                int fd = open(this->outputFile.c_str(), O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
                 dup2(fd, 1);
                 dup2(fd, 2);
 
@@ -94,9 +94,9 @@ void ChildProcess::routineStart()
             }
 
             execl(("/usr/bin/" + maincommand).c_str(), maincommand.c_str(), this->args.c_str(), NULL);
+        } else {
+            waitpid(this->pid, NULL, 0);
         }
-
-        waitpid(this->pid, NULL, 0);
     }
 }
 

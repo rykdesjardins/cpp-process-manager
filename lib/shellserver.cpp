@@ -13,6 +13,9 @@ void SocketServer::start()
     log("Shell", sockpath);
     this->socketfd = socket(AF_UNIX, SOCK_STREAM, 0);
 
+    log("Shell", "Cleaning up old sock file");
+    remove(this->sockpath);
+
     log("Shell", "Creating socket address structure");
     sock_addr.sun_family = AF_UNIX;
     strncpy(sock_addr.sun_path, this->sockpath, sizeof(sock_addr.sun_path));

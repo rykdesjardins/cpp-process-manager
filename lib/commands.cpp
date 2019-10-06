@@ -10,6 +10,7 @@ class StartCommand : public ShellCommand
             cout << "Not yet implemented" << endl;
             return true; 
         }
+
         bool validate() { return true; }
         void showUsage() {}
 };
@@ -110,10 +111,11 @@ ShellCommand * ShellCommandFactory::fromEnum(SHELL_COMMANDS cmd, vector<string> 
 {
     switch (cmd)
     {
-        case INFO_COMMAND: return new InfoCommand(args);
+        case INFO_COMMAND:  return new InfoCommand(args);
         case START_COMMAND: return new StartCommand(args);
-        case KILL_COMMAND: return new KillCommand(args);
-        case ECHO_COMMAND: return new EchoCommand(args);
-        default: return new UnknownCommand(args);
+        case KILL_COMMAND:  return new KillCommand(args);
+        case ECHO_COMMAND:  return new EchoCommand(args);
+
+        default:            return new UnknownCommand(args);
     }
 };
